@@ -20,7 +20,7 @@ cleanrestart:	clean start
 network:
 	docker network create --subnet $(SUBNET).0/24 --gateway $(SUBNET).254 icec
 
-datavolumes:
+datavolume:
 	docker run -d -v $(RDBDATA):/data/db --name $(RDBDATA) --entrypoint /bin/echo debian:wheezy
 
 backup:
