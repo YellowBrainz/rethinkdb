@@ -1,7 +1,7 @@
 NODENAME_RDB=rethinkdb
 AUTHOR=tleijtens
 NAME=rethinkdb
-RDBDATA=rethinkdbdata
+RDBDATA=rethinkdata
 PWD=/dockerbackup
 NETWORKID=42
 SUBNET=10.0.42
@@ -20,14 +20,14 @@ cleanrestart:	clean start
 network:
 	docker network create --subnet $(SUBNET).0/24 --gateway $(SUBNET).254 icec
 
-datavolumes:
-	docker run -d -v $(RDBDATA):/data --name $(RDBDATADB) --entrypoint /bin/echo debian:wheezy
+datavolume:
+	docker run -d -v $(RDBDATA):/data --name $(RDBDATA) --entrypoint /bin/echo debian:wheezy
 
 backup:
-	docker run --rm --volumes-from $(RDBDATADB) -v $(PWD):/backup debian:wheezy bash -c "tar zcvf /backup/$(RDBDATADB).tgz data"
+	docker run --rm --volumes-from $(RDBDATA) -v $(PWD):/backup debian:wheezy bash -c "tar zcvf /backup/$(RDBDATA).tgz data"
 
 restore:
-	docker run --rm --volumes-from $(RDBDATADB) -v $(PWD):/backup debian:wheezy bash -c "tar zxvf backup/$(RDBDATADB).tgz"
+	docker run --rm --volumes-from $(RDBDATA) -v $(PWD):/backup debian:wheezy bash -c "tar zxvf backup/$(RDBDATA).tgz"
 
 rmnetwork:
 	docker network rm icec
