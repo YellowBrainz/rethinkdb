@@ -10,7 +10,7 @@ VERSION=latest
 start:	rethinkdb
 
 stop:
-	docker stop $(NODENAME_RDB)
+	docker stop -t 0 $(NODENAME_RDB)
 
 clean:
 	docker rm -f $(NODENAME_RDB)
@@ -36,7 +36,7 @@ help:
 	docker run -i $(NAME):$(VERSION) help
 
 rethinkdb:
-	docker run -d --net icec --ip $(SUBNET).12 -e SUBNET=$(SUBNET) --volumes-from=$(RDBDATA) -p 8080:8080 --name $(NODENAME_RDB) rethinkdb:latest rethinkdb
+	docker run -d --net icec --ip $(SUBNET).12 -e SUBNET=$(SUBNET) --volumes-from=$(RDBDATA) -p 0.0.0.0:8080:8080 -p 0.0.0.0:28015:28015 -p 0.0.0.0:29015:29015 --name $(NODENAME_RDB) rethinkdb:latest rethinkdb --bind all
 
 rmrethinkdb:
 	docker rm -f $(NODENAME_RDB)
@@ -44,3 +44,8 @@ rmrethinkdb:
 rmdatavolumes:
 	docker rm -f $(RDBDATA)
 	docker volume rm $(RDBDATA)
+
+console:
+	import rethinkdb as r
+	conn = r.connect('localhost', 28015).repl()
+	list(r.db('rethinkdb').table('server_status').run())
